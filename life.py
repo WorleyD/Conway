@@ -3,7 +3,6 @@ import random
 from time import sleep
 import PySimpleGUI as sg
 
-#almsot certainly a better way to do this
 def lives(board, row, cell):
     neighbours = 0
     #first row (cant look North)
@@ -72,53 +71,61 @@ def lives(board, row, cell):
 
 
 def update(board):
-    newboard = [[" " for i in range(MAX)] for i in range(MAX)]
+    newboard = [["_" for i in range(MAX)] for i in range(MAX)]
     flag = False
     for row in range(0,MAX):
         for cell in range(0,MAX):
             #print(row, cell)
             neighbours = lives(board, row, cell)
             if board[row][cell] == "o":
-                flag = True
                 if neighbours == 2 or neighbours == 3:
                     newboard[row][cell] = "o"
                 else:
-                    newboard[row][cell] = " "
+                    newboard[row][cell] = "_"
+                    flag = True
             else:
                 if neighbours == 3:
                     newboard[row][cell] = "o"
+                    flag = True
                 else:
-                    newboard[row][cell] = " "
+                    newboard[row][cell] = "_"
 
     return newboard, flag
 
 def seed():
     r = random.randint(1,400)
-    return "o" if r % 3 == 0 else " "
+    return "o" if r % 3 == 0 else "_"
     
+def initBoard():
+    board = [[seed() for i in range(MAX)] for i in range(MAX)]
+    return board
 
-board = [[seed() for i in range(MAX)] for i in range(MAX)]
-
-out = ""
+board = initBoard()
+out = "#" * (MAX+2) + "\n"
 for row in board:
+    out +="#"
     for cell in row:
         out += cell
-    out += "\n"
+    out += "#\n"
 
-print(out) 
+out += "#" * (MAX+2) + "\n"
+print(out)
 
-window = sg.Window("Welcome to Life", resizable=False).Layout([[sg.Text(out, key='board')]]).Finalize()
+layout = [[sg.Text(out, key='board', size=(30,30))]]
+window = sg.Window("Welcome to Life", resizable=False).Layout(layout).Finalize()
 
 while True:
     print("Life:")
     board, flag = update(board)
     sleep(1) 
-    out = ""
+    out = "#" * (MAX+2) + "\n"
     for row in board:
+        out += "#"
         for cell in row:
             #print(cell, end="_")
             out += cell
-        out += "\n"
+        out += "#\n"
+    out += "#" * (MAX+2) + "\n"
         
     event, values = window.Read(timeout=10)
     window.FindElement('board').Update(out)
