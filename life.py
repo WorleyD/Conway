@@ -8,29 +8,29 @@ def lives(board, row, cell):
     neighbours = 0
     #first row (cant look up)
     if row == 0:
-        #upper left corner (cant look up or left)
+        #if we can look right, do it
         if cell != MAX-1:
             if board[row][cell+1] == "o":
                 neighbours+=1
-        #upper right corner (cant look up or right)
+        #if we can look left, do it
         elif cell != 0:
             if board[row][cell-1] == "o":
                 neighbours+=1
-        #can always look down though        
+        #look down     
         if board[row+1][cell] == "o":
             neighbours+=1
             
     #last row (cant look down)        
     elif row == MAX -1:
-        #lower left corner (cant look down or left)
+        #if we can look right, do it
         if cell != MAX-1:
             if board[row][cell+1] == "o":
                 neighbours+=1
-        #lower right corner (cant look down or right)
+        #if we can look left, do it
         elif cell == MAX-1:
             if board[row][cell-1] == "o":
                 neighbours+=1
-        #can always look up though
+        #look up
         if board[row-1][cell] == "o":
             neighbours+=1
                 
@@ -58,22 +58,22 @@ def update(board):
     for row in range(MAX):
         for cell in range(MAX):
             neighbours = lives(board, row, cell)
-            if board[row][cell] == "_":
+            if board[row][cell] == "o":
                 if neighbours == 2 or neighbours == 3:
                     newboard[row][cell] = "o"
                 else:
                     newboard[row][cell] = "_"
             else:
                 if neighbours == 3:
-                    newboard[row][cell] = "_"
-                else:
                     newboard[row][cell] = "o"
+                else:
+                    newboard[row][cell] = "_"
 
     return newboard
 
 def seed():
     r = random.randint(1,400)
-    return "o" if r % 4 == 0 else "_"
+    return "o" if r % 3 == 0 else "_"
     
 
 board = [[seed() for i in range(MAX)] for i in range(MAX)]
@@ -82,12 +82,12 @@ out = ""
 for row in board:
     for cell in row:
         #print(cell, end="_")
-        out += cell + "_"
+        out += cell + " "
     out += "\n"
 
 print(out) 
 
-window = sg.Window("Welcome to Life", resizable=False).Layout([[sg.Text(out, key='board', size=(50,30))]]).Finalize()
+window = sg.Window("Welcome to Life", resizable=False).Layout([[sg.Text(out, key='board')]]).Finalize()
 
 while True:
     print("Life:")
@@ -97,7 +97,7 @@ while True:
     for row in board:
         for cell in row:
             #print(cell, end="_")
-            out += cell + "_"
+            out += cell + " "
         out += "\n"
         
     event, values = window.Read(timeout=10)
