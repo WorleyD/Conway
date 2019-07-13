@@ -75,14 +75,17 @@ def update(board):
     flag = False
     for row in range(0,MAX):
         for cell in range(0,MAX):
-            #print(row, cell)
+            #get neighbour count for each cell
             neighbours = lives(board, row, cell)
+            
+            #update live cell
             if board[row][cell] == "o":
                 if neighbours == 2 or neighbours == 3:
                     newboard[row][cell] = "o"
                 else:
                     newboard[row][cell] = "_"
                     flag = True
+            #update dead cell
             else:
                 if neighbours == 3:
                     newboard[row][cell] = "o"
@@ -93,14 +96,19 @@ def update(board):
     return newboard, flag
 
 def seed():
+    #random boring seeding
     r = random.randint(1,400)
-    return "o" if r % 9 == 0 else "_"
+    return "o" if r % 6 == 0 else "_"
     
 def initBoard():
+    #seed each cell to save new random board
     board = [[seed() for i in range(MAX)] for i in range(MAX)]
     return board
 
+#create board
 board = initBoard()
+
+#get board plus border as string
 out = "#" * (MAX+2) + "\n"
 for row in board:
     out +="#"
@@ -110,12 +118,15 @@ for row in board:
 
 out += "#" * (MAX+2) + "\n"
 
+#create gui window
 layout = [[sg.Text("Simulation starting:", key='topText', size=(20,2))],[sg.Text(out, key='board')], [sg.Button("Reset")]]
 window = sg.Window("Life", resizable=False).Layout(layout)
 
 while True:
+    #get next board generation
     board, flag = update(board)
     sleep(1) 
+    #update board string for gui
     out = "#" * (MAX+2) + "\n"
     for row in board:
         out += "#"
@@ -123,21 +134,26 @@ while True:
             out += cell
         out += "#\n"
     out += "#" * (MAX+2) + "\n"
-
+    
+    #check for button press
     event, values = window.Read(timeout=10)
     
+    #flag tracks if new board is equal to old board
     if not flag:
+        #prepare to reset if so
         window.FindElement('topText').Update("Simulation has stabilized. Restarting...")
         window.Refresh()
-        
+    #if reset button was pushed    
     if event == "Reset":
+        #prepare
         window.FindElement('topText').Update("Restarting...")
         window.Refresh()
-        
+    
+    #reset board
     if event == "Reset" or not flag:
         sleep(3)
         board = initBoard()
         
+    #update window    
     window.FindElement('topText').Update("Simulation running...")
     window.FindElement('board').Update(out)
-    
