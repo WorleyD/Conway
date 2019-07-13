@@ -94,7 +94,7 @@ def update(board):
 
 def seed():
     r = random.randint(1,400)
-    return "o" if r % 3 == 0 else "_"
+    return "o" if r % 9 == 0 else "_"
     
 def initBoard():
     board = [[seed() for i in range(MAX)] for i in range(MAX)]
@@ -109,24 +109,35 @@ for row in board:
     out += "#\n"
 
 out += "#" * (MAX+2) + "\n"
-print(out)
 
-layout = [[sg.Text(out, key='board', size=(30,30))]]
-window = sg.Window("Welcome to Life", resizable=False).Layout(layout).Finalize()
+layout = [[sg.Text("Simulation starting:", key='topText', size=(20,2))],[sg.Text(out, key='board')], [sg.Button("Reset")]]
+window = sg.Window("Life", resizable=False).Layout(layout)
 
 while True:
-    print("Life:")
     board, flag = update(board)
     sleep(1) 
     out = "#" * (MAX+2) + "\n"
     for row in board:
         out += "#"
         for cell in row:
-            #print(cell, end="_")
             out += cell
         out += "#\n"
     out += "#" * (MAX+2) + "\n"
-        
+
     event, values = window.Read(timeout=10)
+    
+    if not flag:
+        window.FindElement('topText').Update("Simulation has stabilized. Restarting...")
+        window.Refresh()
+        
+    if event == "Reset":
+        window.FindElement('topText').Update("Restarting...")
+        window.Refresh()
+        
+    if event == "Reset" or not flag:
+        sleep(3)
+        board = initBoard()
+        
+    window.FindElement('topText').Update("Simulation running...")
     window.FindElement('board').Update(out)
-    print(out)
+    
